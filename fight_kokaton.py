@@ -210,6 +210,7 @@ def main():
     bird = Bird((300, 200))
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]  
     beams = []  # 複数ビームを管理するリスト
+    explosions = []  # 爆発アニメーションを管理するリスト
     score = Score()  # スコアインスタンスの生成
     clock = pg.time.Clock()
     tmr = 0
@@ -245,6 +246,7 @@ def main():
                 if beam.rct.colliderect(bomb.rct):  # ビームが爆弾を撃ち落とした場合
                     remove_beams.append(beam)  # 削除対象として記録
                     remove_bombs.append(bomb)  # 削除対象として記録
+                    explosions.append(Explosion(bomb.rct.center))  # 爆発生成
                     score.add(1)  # スコア加算
                     bird.change_img(6, screen)
                     break  # 衝突があればそのビームの処理を終了
@@ -264,6 +266,11 @@ def main():
             bomb.update(screen)
         for beam in beams:
             beam.update(screen)
+
+        # 爆発の描画とリスト更新
+        explosions = [exp for exp in explosions if exp.life > 0]
+        for exp in explosions:
+            exp.update(screen)
 
         score.update(screen)  # スコアのアップデート
         pg.display.update()
