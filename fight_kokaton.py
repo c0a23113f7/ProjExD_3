@@ -208,7 +208,7 @@ def main():
     screen = pg.display.set_mode((WIDTH, HEIGHT))    
     bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird((300, 200))
-    bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]  
+    bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]  #BombをNUM_OF_BOMBSの範囲で繰り返す
     beams = []  # 複数ビームを管理するリスト
     explosions = []  # 爆発アニメーションを管理するリスト
     score = Score()  # スコアインスタンスの生成
