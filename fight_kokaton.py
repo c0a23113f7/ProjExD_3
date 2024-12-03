@@ -175,22 +175,23 @@ def main():
     screen = pg.display.set_mode((WIDTH, HEIGHT))    
     bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird((300, 200))
-    bomb = Bomb((255, 0, 0), 10)
-    beam = None  # Beam(bird)  # ビームインスタンス生成
-    # bomb2 = Bomb((0, 0, 255), 20)
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]  
-    score = Score()  #スコアインスタンスの生成
+    beams = []  # 複数ビームを管理するリスト
+    score = Score()  # スコアインスタンスの生成
     clock = pg.time.Clock()
     tmr = 0
+
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 # スペースキー押下でBeamクラスのインスタンス生成
-                beam = Beam(bird)            
+                beams.append(Beam(bird))
+                
         screen.blit(bg_img, [0, 0])
         
+        # こうかとんと爆弾の衝突判定
         for bomb in bombs:
             if bird.rct.colliderect(bomb.rct):
                 # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
@@ -202,25 +203,36 @@ def main():
                 time.sleep(1)
                 return
 
-        for i, bomb in enumerate (bombs):
-            if beam is not None:
-                if beam.rct.colliderect(bomb.rct):  # ビームが爆弾を撃ち落としたら
-                    beam = None
-                    bombs[i] = None
-                    score.add(1)  #スコア加算
-                    bird.change_img(6, screen)
-                    #pg.display.update()
+        # ビームと爆弾の衝突判定
+        remove_beams = []  # 削除対象のビームを記録
+        remove_bombs = []  # 削除対象の爆弾を記録
 
+        for beam in beams:
+            for bomb in bombs:
+                if beam.rct.colliderect(bomb.rct):  # ビームが爆弾を撃ち落とした場合
+                    remove_beams.append(beam)  # 削除対象として記録
+                    remove_bombs.append(bomb)  # 削除対象として記録
+                    score.add(1)  # スコア加算
+                    bird.change_img(6, screen)
+                    break  # 衝突があればそのビームの処理を終了
+
+        # 記録されたビームと爆弾をリストから削除
+        beams = [beam for beam in beams if beam not in remove_beams]
+        bombs = [bomb for bomb in bombs if bomb not in remove_bombs]
+
+        # ビームリストの更新（画面外のビームを除外）
+        beams = [beam for beam in beams if check_bound(beam.rct) == (True, True)]
+
+        # 各オブジェクトの描画と更新
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
-        # beam.update(screen)
-        bombs = [bomb for bomb in bombs if bomb is not None]  # Noneでないものリスト
+
         for bomb in bombs:
             bomb.update(screen)
-        if beam is not None:
+        for beam in beams:
             beam.update(screen)
-        # bomb2.update(screen)
-        score.update(screen)  #スコアのアップデート
+
+        score.update(screen)  # スコアのアップデート
         pg.display.update()
         tmr += 1
         clock.tick(50)
@@ -230,4 +242,4 @@ if __name__ == "__main__":
     pg.init()
     main()
     pg.quit()
-    sys.exit()
+    sys.exit()      
