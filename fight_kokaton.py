@@ -139,6 +139,35 @@ class Bomb:
             self.vy *= -1
         self.rct.move_ip(self.vx, self.vy)
         screen.blit(self.img, self.rct)
+class Score:
+    """
+    ゲームのスコアを管理するクラス
+    """
+    def __init__(self):
+        """
+        スコアの初期化
+        """
+        self.fonto = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
+        self.color = (0, 0, 255)  # スコア表示の文字色（青）
+        self.score = 0  # スコア初期値
+        self.img = self.fonto.render(f"Score: {self.score}", 0, self.color)
+        self.rct = self.img.get_rect()
+        self.rct.center = (100, HEIGHT - 50)  # 画面左下
+
+    def add(self, amount:int):
+        """
+        スコアを加算する
+        引数：加算するスコア
+        """
+        self.score += amount
+        self.img = self.fonto.render(f"Score: {self.score}", 0, self.color)
+
+    def update(self, screen:pg.Surface):
+        """
+        スコアを画面に表示
+        """
+        screen.blit(self.img, self.rct)
+
 
 
 def main():
@@ -149,7 +178,8 @@ def main():
     bomb = Bomb((255, 0, 0), 10)
     beam = None  # Beam(bird)  # ビームインスタンス生成
     # bomb2 = Bomb((0, 0, 255), 20)
-    bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]    
+    bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]  
+    score = Score()  #スコアインスタンスの生成
     clock = pg.time.Clock()
     tmr = 0
     while True:
