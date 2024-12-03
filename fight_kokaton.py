@@ -169,6 +169,39 @@ class Score:
         screen.blit(self.img, self.rct)
 
 
+class Explosion:
+    """
+    爆発アニメーションを管理するクラス
+    """
+    def __init__(self, center: tuple[int, int], life: int = 20):
+        """
+        爆発アニメーションの初期化
+        引数1 center: 爆発の中心座標 (爆弾の位置)
+        引数2 life: 爆発の持続時間
+        """
+        # 爆発アニメーション用のSurfaceをロードし、リストに格納
+        img = pg.image.load("fig/explosion.gif")
+        self.images = [
+            img,  # オリジナル
+            pg.transform.flip(img, True, False),  # 左右反転
+            pg.transform.flip(img, False, True),  # 上下反転
+        ]
+        self.rct = self.images[0].get_rect()
+        self.rct.center = center
+        self.life = life  # 爆発の持続時間
+        self.image_index = 0  # 現在表示中の画像インデックス
+
+    def update(self, screen: pg.Surface):
+        """
+        爆発アニメーションを描画し、時間を減算する
+        引数 screen: 画面Surface
+        """
+        if self.life > 0:
+            screen.blit(self.images[self.image_index], self.rct)
+            self.life -= 1
+            # チラつきを防ぐため、一定周期で画像を切り替え
+            if self.life % 5 == 0:
+                self.image_index = (self.image_index + 1) % len(self.images)
 
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
