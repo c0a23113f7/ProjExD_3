@@ -207,8 +207,9 @@ def main():
                 if beam.rct.colliderect(bomb.rct):  # ビームが爆弾を撃ち落としたら
                     beam = None
                     bombs[i] = None
+                    score.add(1)  #スコア加算
                     bird.change_img(6, screen)
-                    pg.display.update()
+                    #pg.display.update()
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
@@ -219,6 +220,7 @@ def main():
         if beam is not None:
             beam.update(screen)
         # bomb2.update(screen)
+        score.update(screen)
         pg.display.update()
         tmr += 1
         clock.tick(50)
